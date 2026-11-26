@@ -4,7 +4,7 @@
 
 ## 手机上安装
 
-1. 在安卓手机登录有权访问本私有仓库的 GitHub 账号，打开 [v0.1.1 下载页](https://github.com/xxxxchaos/icu-chart-workbench/releases/tag/v0.1.1)，下载带依赖的 **local-icu-workbench-0.1.1.tgz**。
+1. 在安卓手机浏览器打开 [v0.1.1 下载页](https://github.com/xxxxchaos/icu-chart-workbench/releases/tag/v0.1.1)，下载带依赖的 **local-icu-workbench-0.1.1.tgz**。
 2. 在 DSH Go 选择**本机引擎**，把下载的压缩包作为文件交给 DSH Go。可以将下面这段交给本机 DSH 执行：
 
    > 请将我附上的 local-icu-workbench-0.1.1.tgz 解压至本机引擎的 `$DSH_HOME/dsh-go/plugins/local-icu-workbench-0.1.1`，若 DSH_HOME 未设置则用 ~/.dsh。解压时去掉外层 package 目录。保持解压目录及其 node_modules，然后运行 dsh plugin --profile web add 加上该目录的绝对路径。安装完成后告诉我从哪里打开。
