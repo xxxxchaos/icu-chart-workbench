@@ -1,0 +1,65 @@
+{
+  "name": "local-icu-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "ICU日常病程记录模板.md",
+    "README.md",
+    "examples"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.13",
+    "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dshGo": {
+    "v": 1,
+    "title": "ICU 病历书写工作台",
+    "icon": "document",
+    "capabilities": [
+      "files"
+    ],
+    "contributes": {
+      "panels": [
+        {
+          "id": "workbench",
+          "title": "ICU 病历工作台",
+          "icon": "document",
+          "placement": [
+            "session.tab",
+            "features",
+            "chat.panel"
+          ],
+          "presentation": "page"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "@tesseract.js-data/chi_sim": "1.0.0",
+    "@tesseract.js-data/eng": "1.0.0",
+    "fast-xml-parser": "5.12.1",
+    "jpeg-js": "0.4.4",
+    "pngjs": "7.0.0",
+    "tesseract.js": "6.0.1"
+  },
+  "bundledDependencies": [
+    "@tesseract.js-data/chi_sim",
+    "@tesseract.js-data/eng",
+    "fast-xml-parser",
+    "jpeg-js",
+    "pngjs",
+    "tesseract.js"
+  ]
+}
