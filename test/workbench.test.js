@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, rmSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { openStore, today, days } from '../lib/store.js'
@@ -199,4 +199,53 @@ test('跨日草稿及同日加记保留历史；文献不可用时仍可起草',
   assert.match(n.sections.at(-1), /10.4187/)
   assert.match(n.issues.at(-1), /检索未完成/)
   db.close()
+})
+test('没有模型服务时工作台仍可打开；生成给出明确提示', async (t) => {
+  const panel = buildPanel({}, temp(t)),
+    scope = { sessionId: 'no-model' }
+  function walk(node) {
+    return [
+      node,
+      ...[...(node.children || []), ...(node.items || [])].flatMap(walk),
+    ]
+  }
+  async function tap(id, values = {}) {
+    const target = walk(panel.view(scope, { features: [] }))
+      .map((n) => n.action || n.submit)
+      .find((a) => a?.id === id)
+    assert.ok(target, '找不到 ' + id)
+    return panel.actions[id](scope, {
+      value: {
+        ...target.args,
+        values: Object.fromEntries(
+          Object.entries(values).map(([k, v]) => ['data.form.' + k, v]),
+        ),
+      },
+    })
+  }
+  await tap('newCase')
+  await tap('create', fields)
+  assert.match(JSON.stringify(panel.view(scope, { features: [] })), /未检测到 DSH 默认模型/)
+  const result = await tap('generate', {
+    kind: kinds[0],
+    doctor: '张三主任医师',
+    period: '今晨',
+    clock: '08:35',
+  })
+  assert.match(result.toast, /选择默认模型/)
+})
+test('清单提供聊天胶囊与会话操作两个明确入口', () => {
+  const pkg = JSON.parse(
+    readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+  )
+  const panel = pkg.dshGo.contributes.panels.find((p) => p.id === 'workbench')
+  assert.deepEqual(panel.placement, ['session.tab', 'features', 'chat.panel'])
+  const composer = pkg.dshGo.contributes['composer.actions']
+  assert.equal(composer.length, 1)
+  assert.equal(composer[0].label, 'ICU 病历')
+  assert.equal(composer[0].effect.page, 'panel:workbench')
+  const session = pkg.dshGo.contributes['session.actions']
+  assert.equal(session.length, 1)
+  assert.equal(session[0].label, 'ICU 病历工作台')
+  assert.equal(session[0].effect.page, 'panel:workbench')
 })

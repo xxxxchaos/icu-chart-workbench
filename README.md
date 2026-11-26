@@ -2,28 +2,65 @@
 
 安卓 DSH Go 本机引擎插件。每次 ICU 入科建一张患者卡，用手机上传照片、口述病情，按科室确认的 v1.1 文书模板生成日常病程、上级医师查房记录或临时病情变化记录。医生逐段核对和编辑，确认后复制到跨屏通。
 
-**当前公开试用版为 v0.1.1。** 已在桌面 DSH 本机引擎验证安装，并用虚构病例调用 DeepSeek 生成查房草稿。安卓真机选图、手机编辑体验及跨屏通传输仍待验收。维护者请先读[项目交接](https://github.com/xxxxchaos/icu-chart-workbench/blob/main/HANDOFF.md)。
+**当前公开试用版为 v0.1.2。** v0.1.2 新增聊天输入框上方的「ICU 病历」胶囊和右侧信息栏的「ICU 病历工作台」入口；未配置默认模型时也能打开工作台、建卡和录资料。已在桌面 DSH 本机引擎验证安装，并用虚构病例调用 DeepSeek 生成查房草稿。安卓真机选图、手机编辑体验及跨屏通传输仍待验收。维护者请先读[项目交接](https://github.com/xxxxchaos/icu-chart-workbench/blob/main/HANDOFF.md)。
 
 ## 手机上安装
 
-1. 在安卓手机浏览器打开 [v0.1.1 下载页](https://github.com/xxxxchaos/icu-chart-workbench/releases/tag/v0.1.1)，下载带依赖的 **local-icu-workbench-0.1.1.tgz**。
+1. 在安卓手机浏览器打开 [v0.1.2 下载页](https://github.com/xxxxchaos/icu-chart-workbench/releases/tag/v0.1.2)，下载带依赖的 **local-icu-workbench-0.1.2.tgz**。
 2. 在 DSH Go 选择**本机引擎**，把下载的压缩包作为文件交给 DSH Go。可以将下面这段交给本机 DSH 执行：
 
-   > 请将我附上的 local-icu-workbench-0.1.1.tgz 解压至本机引擎的 `$DSH_HOME/dsh-go/plugins/local-icu-workbench-0.1.1`，若 DSH_HOME 未设置则用 ~/.dsh。解压时去掉外层 package 目录。保持解压目录及其 node_modules，然后运行 dsh plugin --profile web add 加上该目录的绝对路径。安装完成后告诉我从哪里打开。
+   > 请将我附上的 local-icu-workbench-0.1.2.tgz 解压至本机引擎的 `$DSH_HOME/dsh-go/plugins/local-icu-workbench-0.1.2`，若 DSH_HOME 未设置则用 ~/.dsh。解压时去掉外层 package 目录。保持解压目录及其 node_modules，然后运行 dsh plugin --profile web add 加上该目录的绝对路径。安装完成后先不要退出，告诉我从哪里打开，以及「设置 → 插件」里是否看到 ICU 病历书写工作台。
 
    如果你的 DSH Go 版本无法导入此类文件，可从本机引擎可读目录运行以下命令，将第一行改为已导入文件的实际路径。
 
    ```sh
-   archive=/path/to/local-icu-workbench-0.1.1.tgz
-   plugin_dir="${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/local-icu-workbench-0.1.1"
+   archive=/path/to/local-icu-workbench-0.1.2.tgz
+   plugin_dir="${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/local-icu-workbench-0.1.2"
    mkdir -p "$plugin_dir"
    tar -xzf "$archive" --strip-components=1 -C "$plugin_dir"
    dsh plugin --profile web add "$plugin_dir"
    ```
 
-3. 在 DSH Go **全部功能 → ICU 病历工作台**打开，也可在对话详情的插件页进入。配置本机引擎的默认模型。生成调用 DSH 的模型服务，沿用其凭据及默认路由。
+3. 安装后先启用，再找入口：
+
+   - 打开 **DSH Go → 设置 → 插件**（也可从「全部功能 → 插件」进入），找到 **ICU 病历书写工作台**，确认右侧开关是打开的；如果列表里没有它，说明装到了别的引擎/profile，回到上一步检查 `DSH_HOME`。
+   - 点进插件详情，展开 **原生界面**，确认「全部功能」「对话详情」「聊天页」至少有一个显示位置没有被关掉。
+   - 回到本机引擎页，**重启引擎**。首次安装或更新后重启一次最稳妥。
+
+   然后从以下任一入口打开：
+
+   - 聊天输入框上方的 **ICU 病历** 胶囊（最直接，进入任意对话即可看到）；
+   - **全部功能 → 插件 → ICU 病历工作台**；
+   - **对话详情 → 插件 → ICU 病历工作台**；
+   - 对话右侧信息栏的 **ICU 病历工作台**。
+
+   工作台不要求先配模型：没有默认模型时也能建卡、记录资料和看历史，生成草稿前会提示去 DSH 设置选择默认模型。生成调用 DSH 的模型服务，沿用其凭据及默认路由。
 
 插件需要带原生 v2 面板的 DSH Go 本机引擎；选图还需宿主提供 files 能力，Node ≥22.13。已在 DSH 0.2.1-rc.2 的隔离 web profile 验证安装。引擎选图能力由 App 版本决定。仅支持文字的模型也可以工作，JPEG/PNG 图片在本机通过随包提供的中英文 Tesseract OCR 读取，提取文字交给模型。
+
+### 还是没有入口
+
+按顺序做这四步，基本能定位：
+
+1. **确认装在同一台本机引擎。** 在 DSH Go 本机引擎里执行：
+
+   ```sh
+   echo "DSH_HOME=$DSH_HOME"
+   dsh --version
+   dsh plugin --profile web list | grep -i icu
+   dsh web --dump-config | grep -A4 local-icu-workbench
+   ls -la "${DSH_HOME:-$HOME/.dsh}/profiles/web/node_modules/local-icu-workbench/package.json"
+   ```
+
+   四项里至少 `plugin list`、`--dump-config` 和 `ls` 应能看到 `local-icu-workbench`。如果都没有，说明压缩包解到了另一个 `DSH_HOME` 或另一个 profile；重新按上面的绝对路径安装。
+
+2. **确认启用。** **设置 → 插件** 里找到插件，开关打开；**插件详情 → 原生界面** 里看有没有 `plugin-error`、`needs-app` 或某处显示位置被关掉。原生日志会写在插件详情页，不是所有错误都会弹窗。
+
+3. **重启引擎。** 改完开关或更新包后，回到本机引擎页停止再启动；只刷新页面不一定重新加载插件。
+
+4. **看诊断。** **设置 → 诊断** 里导出诊断包，或点「让 AI 看诊断」；把插件详情里的错误行截图给维护者。没有入口但插件已启用，通常是 `dshGo` 桥接没加载、App 版本不支持某个位置，或引擎仍在安全模式。
+
+   安全模式下 App 不加载自装插件；确认本机引擎页不是在**安全模式**，并且当前主机是**本机**而不是远程主机。
 
 ## 试写
 
